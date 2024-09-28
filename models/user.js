@@ -3,10 +3,13 @@ const mongoose = require("mongoose");
 //Admin && User == _id, email, password, firstname, lastname
 
 const usersSchema = new mongoose.Schema({
-  email: String,
+  email: {
+    type: String,
+    unique: true,
+  },
   password: String,
-  firstname: String,
-  lastname: String,
+  firstName: String,
+  lastName: String,
 });
-const usersModel = mongoose.model("admin", usersSchema);
+const usersModel = mongoose.model("users", usersSchema);
 module.exports = { usersModel };

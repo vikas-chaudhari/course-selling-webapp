@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { string } = require("zod");
 
 //Admin && User == _id, email, password, firstname, lastname
 

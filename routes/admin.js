@@ -3,7 +3,7 @@ const adminRouter = express.Router();
 const { adminsModel } = require("../models/admin");
 const { hashPassword, compare } = require("../utils/bcrypt");
 const { z } = require("zod");
-const { signToken } = require("../utils/jwt");
+const { signAdminToken } = require("../utils/jwt");
 const { adminAuth } = require("../middlewares/admin");
 const { coursesModel } = require("../models/course");
 
@@ -65,7 +65,7 @@ adminRouter.post("/signin", async (req, res) => {
       });
 
       if (await compare(admin.password, adminData.password)) {
-        const token = signToken(adminData._id.toString());
+        const token = signAdminToken(adminData._id.toString());
         res.json({ msg: "admin logged in", token });
       } else {
         res.json({ msg: "unauthenticated acces" });

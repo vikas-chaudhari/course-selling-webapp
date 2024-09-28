@@ -1,9 +1,9 @@
-const { verifyToken } = require("../utils/jwt");
+const { verifyAdminToken } = require("../utils/jwt");
 
 async function adminAuth(req, res, next) {
   try {
     const token = req.headers.auth;
-    const user = verifyToken(token);
+    const user = verifyAdminToken(token);
     req.admin = user;
     if (token && user) {
       next();
@@ -13,8 +13,6 @@ async function adminAuth(req, res, next) {
   } catch (error) {
     res.json({ error });
   }
-
-  //   if (user) {}
 }
 
 module.exports = { adminAuth };
