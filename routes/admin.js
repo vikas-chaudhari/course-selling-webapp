@@ -103,7 +103,7 @@ adminRouter.post("/add-course", adminAuth, async (req, res) => {
     res.json({ error });
   }
 });
-adminRouter.put("/update-course/:id", adminAuth, async (req, res) => {
+adminRouter.put("/update-course/:courseId", adminAuth, async (req, res) => {
   const course = {
     title: req.body.title,
     description: req.body.description,
@@ -112,14 +112,12 @@ adminRouter.put("/update-course/:id", adminAuth, async (req, res) => {
     creatorId: req.admin,
   };
   try {
-    const courseData = await coursesModel.find({ _id: req.params.id });
-    console.log(courseData.creatorId);
-    console.log(req.params.id);
+    const courseData = await coursesModel.findOne({ _id: req.params.courseId });
 
-    if (req.params.id === courseData.creatorId) {
-      console.log(matched);
+    if (req.admin !== courseData.creatorId.toString()) {
+      res.json({ msg: "This course is not created by logged in user" });
+      return;
     }
-    console.log(courseData);
     const courseSchema = z.object({
       title: z.string().min(5).max(30),
       description: z.string().min(5).max(500),
@@ -132,13 +130,33 @@ adminRouter.put("/update-course/:id", adminAuth, async (req, res) => {
       res.json({ validationResult: validationResult.error });
       return;
     }
+    await coursesModel.updateOne({ _id: req.params.courseId }, course);
     res.json({ msg: "course updated" });
   } catch (error) {
-    res.json({ error });
+    res.json({ error: error + "" });
+  }
+});
+adminRouter.delete("/delete-course/:courseId", adminAuth, async (req, res) => {
+  try {
+    const courseData = await coursesModel.findOne({ _id: req.params.courseId });
+
+    if (req.admin !== courseData.creatorId.toString()) {
+      res.json({ msg: "This course is not created by logged in user" });
+      return;
+    }
+    await coursesModel.deleteOne({ _id: req.params.courseId });
+    res.json({ msg: "course deleted" });
+  } catch (error) {
+    res.json({ error: error + "" });
   }
 });
 adminRouter.get("/", adminAuth, async (req, res) => {
-  res.json({ success: "accessed", _id: req.admin });
+  try {
+    const courses = await coursesModel.find({ creatorId: req.admin });
+    res.json(courses);
+  } catch (error) {
+    res.json({ error: error + "" });
+  }
 });
 
 module.exports = { adminRouter };
