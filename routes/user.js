@@ -5,6 +5,7 @@ const { hashPassword, compare } = require("../utils/bcrypt");
 const { z } = require("zod");
 const { signUserToken } = require("../utils/jwt");
 const { userAuth } = require("../middlewares/user");
+const { coursesModel } = require("../models/course");
 
 userRouter.post("/signup", async (req, res) => {
   const user = {
@@ -76,3 +77,12 @@ userRouter.get("/purchases", userAuth, async (req, res) => {
   res.json({ purchases: "success" });
 });
 module.exports = { userRouter };
+
+userRouter.get("/", userAuth, async (req, res) => {
+  try {
+    const courses = await coursesModel.find();
+    res.json({ courses: courses });
+  } catch (error) {
+    res.json({ msg: error });
+  }
+});
